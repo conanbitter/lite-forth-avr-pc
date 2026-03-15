@@ -19,9 +19,9 @@
 
 #define INITIAL_SCALE (2)
 
-#define CURSOR_LEFT (0)
+#define CURSOR_LEFT (1)
 #define CURSOR_TOP (10)
-#define CURSOR_WIDTH (6)
+#define CURSOR_WIDTH (5)
 #define CURSOR_HEIGHT (2)
 
 #define CURSOR_BLINK_PERIOD (500000000)
