@@ -4,6 +4,11 @@ project(lfa VERSION 0.1 LANGUAGES C)
 
 set(EXECUTABLE_OUTPUT_PATH ./${CMAKE_BUILD_TYPE})
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+
+add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
+
 set(INCLUDE_FILES
     include.h
 )
@@ -17,6 +22,7 @@ list(TRANSFORM SRC_FILES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 add_executable(lfa ${INCLUDE_FILES} ${SRC_FILES})
 target_include_directories(lfa PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(lfa PRIVATE SDL3::SDL3)
 
 #target_link_options(lfa PRIVATE -SUBSYSTEM:WINDOWS)
 
