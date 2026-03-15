@@ -16,9 +16,12 @@
 #define FONT_COLS (16)
 #define FONT_ROWS (16)
 
+#define INITIAL_SCALE (2)
+
 SDL_Renderer* renderer;
 SDL_Window* window;
 SDL_Texture* font_texture;
+SDL_Texture* frame_texture;
 
 SDL_FRect text_src;
 SDL_FRect text_dst;
@@ -34,12 +37,14 @@ void drawLetter(char letter, int x, int y) {
 }
 
 int main() {
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_Log("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
 
-    window = SDL_CreateWindow("Minimal SDL3 App", FRAME_WIDTH, FRAME_HEIGHT, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("Forth", FRAME_WIDTH * INITIAL_SCALE, FRAME_HEIGHT * INITIAL_SCALE, SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         SDL_Log("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         SDL_Quit();
@@ -53,7 +58,11 @@ int main() {
         SDL_Log("Could not load font image! SDL_Error: %s\n", SDL_GetError());
     }
     font_texture = SDL_CreateTextureFromSurface(renderer, font_surface);
+    SDL_SetTextureScaleMode(font_texture, SDL_SCALEMODE_NEAREST);
     SDL_DestroySurface(font_surface);
+
+    frame_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, FRAME_WIDTH, FRAME_HEIGHT);
+    SDL_SetTextureScaleMode(frame_texture, SDL_SCALEMODE_NEAREST);
 
     text_src.w = CHAR_WIDTH;
     text_src.h = CHAR_HEIGHT;
@@ -70,6 +79,7 @@ int main() {
                 quit = true;
             }
         }
+        SDL_SetRenderTarget(renderer, frame_texture);
         SDL_RenderClear(renderer);
         //SDL_RenderTexture(renderer, font_texture, NULL, NULL);
         char* cur_char = sample_text;
@@ -79,10 +89,14 @@ int main() {
             x++;
             cur_char++;
         }
+        SDL_SetRenderTarget(renderer, NULL);
+        SDL_RenderClear(renderer);
+        SDL_RenderTexture(renderer, frame_texture, NULL, NULL);
 
         SDL_RenderPresent(renderer);
     }
 
+    SDL_DestroyTexture(frame_texture);
     SDL_DestroyTexture(font_texture);
     SDL_DestroyWindow(window);
     SDL_Quit();
