@@ -69,14 +69,44 @@ int main() {
     text_dst.w = CHAR_WIDTH;
     text_dst.h = CHAR_HEIGHT;
 
-    char* sample_text = "This is a sample text.\x02";
+    char sample_text[80];
+    memset(sample_text, 0, 80);
+    sample_text[0] = '>';
+    int caret = 1;
+    int y = 1;
 
     bool quit = false;
     SDL_Event e;
+    SDL_StartTextInput(window);
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_EVENT_QUIT) {
+            switch (e.type)
+            {
+            case SDL_EVENT_QUIT:
                 quit = true;
+                break;
+
+            case SDL_EVENT_TEXT_INPUT:
+                if (e.text.text[1] == '\0') {
+                    sample_text[caret] = e.text.text[0];
+                    caret++;
+                }
+                break;
+
+            case SDL_EVENT_KEY_DOWN:
+                if (e.key.key == SDLK_BACKSPACE) {
+                    if (caret > 1) {
+                        caret--;
+                        sample_text[caret] = '\0';
+                    }
+                }
+                if (e.key.key == SDLK_RETURN) {
+                    y++;
+                }
+                break;
+
+            default:
+                break;
             }
         }
         SDL_SetRenderTarget(renderer, frame_texture);
@@ -85,7 +115,7 @@ int main() {
         char* cur_char = sample_text;
         int x = 10;
         while (*cur_char != '\0') {
-            drawLetter(*cur_char, x, 1);
+            drawLetter(*cur_char, x, y);
             x++;
             cur_char++;
         }
