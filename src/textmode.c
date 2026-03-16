@@ -37,7 +37,9 @@ static Uint64 cursor_blink_time = 0;
 static int cursor_x = 0;
 static int cursor_y = 0;
 static int cursor_pos = 0;
-static SDL_Rect* cursor_shape = &CURSOR_SHAPE_INSERT;
+static const SDL_Rect* cursor_shape = &CURSOR_SHAPE_INSERT;
+
+static int tab_size = 8;
 
 static TmColor fg_color;
 
@@ -125,11 +127,50 @@ void tm_draw(SDL_Renderer* renderer) {
 
 void tm_clrscr() {
     for (int i = 0;i < BUFFER_LENGTH;i++) {
-        buffer[i].letter = rand() % 255;
+        buffer[i].letter = ' ';
         buffer[i].fg_color = fg_color;
-        buffer[i].fg_color.r = rand() % 255;
-        buffer[i].fg_color.g = rand() % 255;
-        buffer[i].fg_color.b = rand() % 255;
     }
     setCursorXY(0, 0);
+}
+
+void tm_emit(int letter) {
+    buffer[cursor_pos].letter = letter;
+    buffer[cursor_pos].fg_color = fg_color;
+    setCursorPos(cursor_pos + 1);
+}
+
+void tm_putc(char letter) {
+    switch (letter)
+    {
+    case '\b':
+        setCursorPos(cursor_pos - 1);
+        break;
+
+    case '\n':
+        setCursorXY(cursor_x, cursor_y + 1);
+        break;
+
+    case '\r':
+        setCursorXY(0, cursor_y);
+        break;
+
+    case '\t':
+        do {
+            tm_emit(' ');
+        } while (cursor_x % tab_size != 0);
+        break;
+
+    default:
+        tm_emit(letter);
+        break;
+    }
+}
+
+void tm_print(const char* text) {
+    const char* letter = text;
+    while (*letter != '\0')
+    {
+        tm_putc(*letter);
+        letter++;
+    }
 }

@@ -35,6 +35,8 @@ int main() {
 
     last_time = SDL_GetTicksNS();
 
+    tm_print("This is a test message.");
+
     bool quit = false;
     SDL_Event e;
     SDL_StartTextInput(window);
@@ -48,16 +50,20 @@ int main() {
 
             case SDL_EVENT_TEXT_INPUT:
                 if (e.text.text[1] == '\0') {
-
+                    tm_putc(e.text.text[0]);
                 }
                 break;
 
             case SDL_EVENT_KEY_DOWN:
                 if (e.key.key == SDLK_BACKSPACE) {
-
+                    tm_putc('\b');
                 }
                 if (e.key.key == SDLK_RETURN) {
-
+                    tm_putc('\r');
+                    tm_putc('\n');
+                }
+                if (e.key.key == SDLK_TAB) {
+                    tm_putc('\t');
                 }
                 break;
 
