@@ -11,6 +11,34 @@ SDL_Texture* frame_texture;
 
 Uint64 last_time = 0;
 
+const char* lorem_ipsum =
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac egestas\r\n"
+"tortor. Cras scelerisque ornare semper. Ut tortor nisl, imperdiet eget dolor\r\n"
+"sed, tincidunt iaculis risus. Curabitur commodo, sem ut tristique congue, magna\r\n"
+"enim vulputate diam, a facilisis magna dui eu mi. Quisque convallis, nisl vitae\r\n"
+"porta porta, arcu risus fermentum nunc, quis aliquet lacus ante eu arcu.\r\n"
+"Suspendisse fermentum massa lacus, eget convallis ligula blandit et.\r\n"
+"Suspendisse a lorem mattis, tempus nunc sed, laoreet purus. Nulla eget enim\r\n"
+"pellentesque, sagittis mauris ac, ullamcorper leo. Vestibulum vel ante id dui\r\n"
+"accumsan blandit.\r\n"
+"Donec iaculis nisi eu augue consequat, quis posuere neque pharetra. Duis\r\n"
+"sollicitudin bibendum risus sit amet vehicula. Donec euismod accumsan turpis,\r\n"
+"eget egestas libero. Cras sit amet tincidunt massa, non commodo nunc. Aliquam\r\n"
+"tincidunt massa eu enim vehicula ornare. Cras lobortis porta tempus. Nam\r\n"
+"pretium metus nisl. Cras congue a velit in maximus. Suspendisse urna ligula,\r\n"
+"fermentum et tempus sed, ullamcorper sit amet sem. Morbi nec nulla et libero\r\n"
+"scelerisque aliquam ut nec lorem. Nunc efficitur nisi ac ultrices pharetra.\r\n"
+"Nullam efficitur ligula quis massa tempor facilisis.\r\n"
+"Donec sollicitudin sed risus in tristique. Donec nec dignissim mi. Quisque\r\n"
+"elementum felis enim, at tempor sapien hendrerit vitae. Praesent facilisis\r\n"
+"risus et aliquet blandit. Nam nec ullamcorper dolor. Pellentesque ex ligula,\r\n"
+"tempus sed nunc vitae, congue semper justo. Aenean auctor, ipsum vel fermentum\r\n"
+"rhoncus, urna odio vulputate odio, sed cursus est ex accumsan nulla. Ut a\r\n"
+"consequat nisi, eget consequat tortor.\r\n"
+"Sed lacinia nec lectus id tempus. Vivamus in lectus semper, rhoncus ipsum id,\r\n"
+"tristique mauris. Donec vulputate felis in elit fermentum porttitor. Sed\r\n"
+"pretium consectetur consectetur.";
+
 int main() {
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
@@ -35,7 +63,7 @@ int main() {
 
     last_time = SDL_GetTicksNS();
 
-    tm_print("This is a test message.");
+    tm_print(lorem_ipsum);
 
     bool quit = false;
     SDL_Event e;
