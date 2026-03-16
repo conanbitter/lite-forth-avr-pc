@@ -11,10 +11,13 @@ add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 
 set(INCLUDE_FILES
     include.h
+    common.h
+    textmode.h
 )
 
 set(SRC_FILES
     main.c
+    textmode.c
 )
 
 list(TRANSFORM INCLUDE_FILES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/include/)
