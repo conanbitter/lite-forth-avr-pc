@@ -87,8 +87,9 @@ int main() {
                     tm_putc('\b');
                 }
                 if (e.key.key == SDLK_RETURN) {
-                    tm_putc('\r');
-                    tm_putc('\n');
+                    //tm_putc('\r');
+                    //tm_putc('\n');
+                    tm_scroll(1);
                 }
                 if (e.key.key == SDLK_TAB) {
                     tm_putc('\t');

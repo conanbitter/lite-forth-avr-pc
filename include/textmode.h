@@ -22,6 +22,7 @@ void tm_draw(SDL_Renderer* renderer);
 void tm_clrscr();
 void tm_putc(char letter);
 void tm_print(const char* text);
+void tm_scroll(int line_count);
 
 
 #endif

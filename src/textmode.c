@@ -65,6 +65,13 @@ static void setCursorPos(int pos) {
     cursor_blink_time = 0;
 }
 
+static void updateCursorXY() {
+    cursor_x = cursor_pos % TM_COLS;
+    cursor_y = cursor_pos / TM_COLS;
+    text_cursor.x = cursor_x * CHAR_WIDTH + TEXT_XOFFSET + cursor_shape->x;
+    text_cursor.y = cursor_y * CHAR_HEIGHT + TEXT_YOFFSET + cursor_shape->y;
+}
+
 void tm_init(SDL_Renderer* renderer) {
     SDL_Surface* font_surface = SDL_LoadBMP("font.bmp");
     if (font_surface == NULL) {
@@ -173,4 +180,25 @@ void tm_print(const char* text) {
         tm_putc(*letter);
         letter++;
     }
+}
+
+void tm_scroll(int line_count) {
+    if (line_count >= TM_ROWS) {
+        tm_clrscr();
+        return;
+    }
+
+    int offset = line_count * TM_COLS;
+    int moved_lines = TM_ROWS - line_count;
+
+    memmove(&buffer[0], &buffer[offset], sizeof(TmCell) * TM_COLS * moved_lines);
+
+    for (int i = moved_lines * TM_COLS;i < BUFFER_LENGTH;i++) {
+        buffer[i].letter = ' ';
+        buffer[i].fg_color = fg_color;
+    }
+
+    cursor_pos -= offset;
+    if (cursor_pos < 0)cursor_pos = 0;
+    updateCursorXY();
 }
