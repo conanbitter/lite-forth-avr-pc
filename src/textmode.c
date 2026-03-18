@@ -224,7 +224,12 @@ void tm_edit_finish() {
 }
 
 void tm_type(char letter) {
-    if (!editing || editable_end - editable_begin == MAX_INPUT_LENGTH) return;
+    if (!editing ||
+        (
+            (is_insert || cursor_pos == editable_end) &&
+            editable_end - editable_begin == MAX_INPUT_LENGTH
+            )
+        ) return;
     if (is_insert) {
         if (cursor_pos < editable_end) {
             memmove(&buffer[cursor_pos + 1], &buffer[cursor_pos], sizeof(TmCell) * (editable_end - cursor_pos));
