@@ -278,7 +278,13 @@ void tm_command(enum TmCommand command) {
         break;
     case TMCMD_BACKSPACE:
         if (cursor_pos > editable_begin) {
-            delete_char(cursor_pos - 1);
+            if (cursor_pos < editable_end) {
+                delete_char(cursor_pos - 1);
+            } else {
+                buffer[cursor_pos - 1].letter = ' ';
+                buffer[cursor_pos - 1].fg_color = fg_color;
+                editable_end--;
+            }
             cursor_pos--;
             updateCursorXY();
         }
