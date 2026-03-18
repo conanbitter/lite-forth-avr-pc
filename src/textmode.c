@@ -13,6 +13,7 @@
 #define CURSOR_BLINK_PERIOD (500000000)
 
 #define BUFFER_LENGTH (TM_COLS*TM_ROWS)
+#define MAX_INPUT_LENGTH (10)
 
 static const SDL_Rect CURSOR_SHAPE_INSERT = { .x = 1,.y = 10,.w = 5,.h = 2 };
 static const SDL_Rect CURSOR_SHAPE_REPLACE = { .x = 1,.y = 0,.w = 5,.h = 12 };
@@ -38,6 +39,10 @@ static int cursor_x = 0;
 static int cursor_y = 0;
 static int cursor_pos = 0;
 static const SDL_Rect* cursor_shape = &CURSOR_SHAPE_INSERT;
+static int editable_begin = 0;
+static int editable_end = 0;
+static bool editing = false;
+static bool is_insert = true;
 
 static int tab_size = 8;
 
@@ -201,4 +206,21 @@ void tm_scroll(int line_count) {
     cursor_pos -= offset;
     if (cursor_pos < 0)cursor_pos = 0;
     updateCursorXY();
+}
+
+void tm_edit_start() {
+    editing = true;
+    editable_end = editable_begin = cursor_pos;
+}
+
+void tm_edit_end() {
+    editing = false;
+}
+
+void tm_type(char letter) {
+    if (!editing) return;
+}
+
+void tm_command(int command) {
+    if (!editing) return;
 }
