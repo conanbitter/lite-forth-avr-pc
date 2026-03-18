@@ -64,6 +64,7 @@ int main() {
     last_time = SDL_GetTicksNS();
 
     tm_print(lorem_ipsum);
+    tm_edit_start();
 
     bool quit = false;
     SDL_Event e;
@@ -78,15 +79,65 @@ int main() {
 
             case SDL_EVENT_TEXT_INPUT:
                 if (e.text.text[1] == '\0') {
-                    tm_putc(e.text.text[0]);
+                    //tm_putc(e.text.text[0]);
+                    tm_type(e.text.text[0]);
                 }
                 break;
 
             case SDL_EVENT_KEY_DOWN:
-                if (e.key.key == SDLK_BACKSPACE) {
+                switch (e.key.key)
+                {
+                case SDLK_RETURN:
+                    tm_command(TMCMD_RETURN);
+                    break;
+
+                case SDLK_DELETE:
+                    tm_command(TMCMD_DELETE);
+                    break;
+
+                case SDLK_BACKSPACE:
+                    tm_command(TMCMD_BACKSPACE);
+                    break;
+
+                case SDLK_TAB:
+                    tm_command(TMCMD_TAB);
+                    break;
+
+                case SDLK_HOME:
+                    tm_command(TMCMD_HOME);
+                    break;
+
+                case SDLK_END:
+                    tm_command(TMCMD_END);
+                    break;
+
+                case SDLK_INSERT:
+                    tm_command(TMCMD_INSERT);
+                    break;
+
+                case SDLK_LEFT:
+                    tm_command(TMCMD_LEFT);
+                    break;
+
+                case SDLK_RIGHT:
+                    tm_command(TMCMD_RIGHT);
+                    break;
+
+                case SDLK_UP:
+                    tm_command(TMCMD_UP);
+                    break;
+
+                case SDLK_DOWN:
+                    tm_command(TMCMD_DOWN);
+                    break;
+
+                default:
+                    break;
+                }
+                /*if (e.key.key == SDLK_BACKSPACE) {
                     tm_putc('\b');
                 }
-                if (e.key.key == SDLK_RETURN) {
+                if (e.key.key == ) {
                     //tm_putc('\r');
                     //tm_putc('\n');
                     tm_scroll(1);
@@ -94,7 +145,7 @@ int main() {
                 if (e.key.key == SDLK_TAB) {
                     tm_putc('\t');
                 }
-                break;
+                break;*/
 
             default:
                 break;

@@ -13,7 +13,7 @@
 #define CURSOR_BLINK_PERIOD (500000000)
 
 #define BUFFER_LENGTH (TM_COLS*TM_ROWS)
-#define MAX_INPUT_LENGTH (10)
+#define MAX_INPUT_LENGTH (255)
 
 static const SDL_Rect CURSOR_SHAPE_INSERT = { .x = 1,.y = 10,.w = 5,.h = 2 };
 static const SDL_Rect CURSOR_SHAPE_REPLACE = { .x = 1,.y = 0,.w = 5,.h = 12 };
@@ -75,6 +75,8 @@ static void updateCursorXY() {
     cursor_y = cursor_pos / TM_COLS;
     text_cursor.x = cursor_x * CHAR_WIDTH + TEXT_XOFFSET + cursor_shape->x;
     text_cursor.y = cursor_y * CHAR_HEIGHT + TEXT_YOFFSET + cursor_shape->y;
+    cursor_blink = true;
+    cursor_blink_time = 0;
 }
 
 void tm_init(SDL_Renderer* renderer) {
@@ -204,8 +206,12 @@ void tm_scroll(int line_count) {
     }
 
     cursor_pos -= offset;
-    if (cursor_pos < 0)cursor_pos = 0;
+    if (cursor_pos < 0) cursor_pos = 0;
     updateCursorXY();
+    editable_begin -= offset;
+    if (editable_begin < 0) editable_begin = 0;
+    editable_end -= offset;
+    if (editable_end < 0) editable_end = 0;
 }
 
 void tm_edit_start() {
@@ -213,14 +219,112 @@ void tm_edit_start() {
     editable_end = editable_begin = cursor_pos;
 }
 
-void tm_edit_end() {
+void tm_edit_finish() {
     editing = false;
 }
 
 void tm_type(char letter) {
-    if (!editing) return;
+    if (!editing || editable_end - editable_begin == MAX_INPUT_LENGTH) return;
+    if (is_insert) {
+        if (cursor_pos < editable_end) {
+            memmove(&buffer[cursor_pos + 1], &buffer[cursor_pos], sizeof(TmCell) * (editable_end - cursor_pos));
+        }
+        buffer[cursor_pos].letter = letter;
+        buffer[cursor_pos].fg_color = fg_color;
+        cursor_pos++;
+        editable_end++;
+        if (editable_end >= BUFFER_LENGTH) {
+            tm_scroll(1);
+        } else {
+            updateCursorXY();
+        }
+    } else {
+        buffer[cursor_pos].letter = letter;
+        buffer[cursor_pos].fg_color = fg_color;
+        cursor_pos++;
+        updateCursorXY();
+        if (editable_end < cursor_pos) {
+            editable_end = cursor_pos;
+            if (editable_end >= BUFFER_LENGTH) tm_scroll(1);
+        }
+    }
 }
 
-void tm_command(int command) {
+static void delete_char(int pos) {
+    memmove(&buffer[pos], &buffer[pos + 1], sizeof(TmCell) * (editable_end - pos));
+    editable_end--;
+}
+
+void tm_command(enum TmCommand command) {
     if (!editing) return;
+    switch (command)
+    {
+    case TMCMD_RETURN:
+        tm_edit_finish();
+        cursor_pos = editable_end;
+        updateCursorXY();
+        break;
+    case TMCMD_DELETE:
+        if (cursor_pos < editable_end) {
+            delete_char(cursor_pos);
+            cursor_blink = true;
+            cursor_blink_time = 0;
+        }
+        break;
+    case TMCMD_BACKSPACE:
+        if (cursor_pos > editable_begin) {
+            delete_char(cursor_pos - 1);
+            cursor_pos--;
+            updateCursorXY();
+        }
+        break;
+    case TMCMD_TAB:
+        do {
+            tm_type(' ');
+        } while (cursor_x % tab_size != 0);
+        break;
+    case TMCMD_HOME:
+    {
+        int y = cursor_pos / TM_COLS;
+        int new_pos = y * TM_COLS;
+        if (new_pos > editable_begin) {
+            cursor_pos = new_pos;
+        } else {
+            cursor_pos = editable_begin;
+        }
+        updateCursorXY();
+    }
+    break;
+    case TMCMD_END:
+    {
+        int y = cursor_pos / TM_COLS;
+        int new_pos = (y + 1) * TM_COLS - 1;
+        if (new_pos < editable_end) {
+            cursor_pos = new_pos;
+        } else {
+            cursor_pos = editable_end;
+        }
+        updateCursorXY();
+    }
+    break;
+    case TMCMD_INSERT:
+        is_insert = !is_insert;
+        cursor_shape = is_insert ? &CURSOR_SHAPE_INSERT : &CURSOR_SHAPE_REPLACE;
+        text_cursor.w = cursor_shape->w;
+        text_cursor.h = cursor_shape->h;
+        updateCursorXY();
+        break;
+    case TMCMD_LEFT:
+        if (cursor_pos > editable_begin) {
+            cursor_pos--;
+            updateCursorXY();
+        }
+        break;
+    case TMCMD_RIGHT:
+        if (cursor_pos < editable_end) {
+            cursor_pos++;
+            updateCursorXY();
+        }
+        break;
+    }
 }

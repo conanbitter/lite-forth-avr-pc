@@ -10,6 +10,7 @@ enum TmCommand {
     TMCMD_RETURN = 1,
     TMCMD_DELETE,
     TMCMD_BACKSPACE,
+    TMCMD_TAB,
     TMCMD_HOME,
     TMCMD_END,
     TMCMD_INSERT,
@@ -39,6 +40,6 @@ void tm_scroll(int line_count);
 
 void tm_edit_start();
 void tm_type(char letter);
-void tm_command(int command);
+void tm_command(enum TmCommand command);
 
 #endif
